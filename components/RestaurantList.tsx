@@ -24,8 +24,8 @@ export default function RestaurantList({ session }: { session: Session }) {
       if (!session?.user) throw new Error('No user on the session!')
 
       const { data, error, status } = await supabase
-        .from('restaurants')
-        .select('id, name, image_url')
+        .from('restaurant')
+        .select('id, name, photo_url')
 
       if (error && status !== 406) throw error
 
@@ -41,7 +41,7 @@ export default function RestaurantList({ session }: { session: Session }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Restaurants</Text>
+      <Text style={styles.title}>Local Favorites</Text>
       {loading ? (
         <Text style={styles.loading}>Loading...</Text>
       ) : (
@@ -56,7 +56,6 @@ export default function RestaurantList({ session }: { session: Session }) {
                 </View>
               )}
               <Text style={styles.name}>{restaurant.name}</Text>
-              <Restaurant session={session} id={restaurant.id} />
             </TouchableOpacity>
           ))}
         </ScrollView>

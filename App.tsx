@@ -3,6 +3,7 @@ import { supabase } from './lib/supabase'
 import Auth from './components/Auth'
 import Account from './components/Account'
 import Restaurant from './components/Restaurant'
+import Main from './components/Main'
 import { View } from 'react-native'
 import { Session } from '@supabase/supabase-js'
 
@@ -22,7 +23,7 @@ export default function App() {
 
   return (
     <View style={{flex: 1}}>
-      {session && session.user ? <Restaurant session={session} id={id}/> : <Auth />}
+      {session && session.user ? <Main session={session}/> : <Auth />}
     </View>
   )
 }

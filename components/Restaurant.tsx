@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { Session } from '@supabase/supabase-js'
 import Menu from './Menu'
-import { RestaurantType } from '../Types'
+import { RestaurantType } from '../types'
 import { Animated, View, Text, Alert, Image, StyleSheet } from 'react-native'
 import Constants from 'expo-constants'
 
