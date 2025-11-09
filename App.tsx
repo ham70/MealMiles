@@ -1,30 +1,36 @@
-import { useState, useEffect } from 'react'
-import { supabase } from './lib/supabase'
+import { NavigationContainer } from '@react-navigation/native'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Auth from './components/Auth'
 import Account from './components/Account'
-import { View } from 'react-native'
-import { Session } from '@supabase/supabase-js'
-import {createNativeStackNavigator} from '@react-navigation/native-stack'
-import { NavigationContainer } from '@react-navigation/native'
+import SelectRoles from './components/SelectRoles'
 
-export default function App() {
-  const [session, setSession] = useState<Session | null>(null)
+const Stack = createNativeStackNavigator()
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-    })
+function AppNavigator() {
+  const { session, loading } = useAuth()
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-  }, [])
+  if (loading) return null // or show a loading spinner
 
   return (
     <NavigationContainer>
-      <View>
-        {session && session.user ? <Account key={session.user.id} session={session} /> : <Auth />}
-      </View>
+      {session && session.user ? (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="SelectRole" component={SelectRoles} />
+        </Stack.Navigator>
+      ) : (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Auth" component={Auth} />
+        </Stack.Navigator>
+      )}
     </NavigationContainer>
+  )
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppNavigator />
+    </AuthProvider>
   )
 }

@@ -2,14 +2,15 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { StyleSheet, View, Alert } from 'react-native'
 import { Button, Input } from '@rneui/themed'
-import { useAuth } from '../contexts/AuthContext' // 👈 import the hook
+import { Checkbox } from 'expo-checkbox'
+import { useAuth } from '../contexts/AuthContext' // 👈 import your hook
 
-export default function Account() {
+export default function SelectRoles() {
   const { session } = useAuth() // 👈 get session from context
   const [loading, setLoading] = useState(true)
-  const [username, setUsername] = useState('')
-  const [website, setWebsite] = useState('')
-  const [avatarUrl, setAvatarUrl] = useState('')
+  const [firstname, setFirstname] = useState('')
+  const [lastname, setLastname] = useState('')
+  const [isRestaurant, setRestaurant] = useState(false)
 
   useEffect(() => {
     if (session) getProfile()
@@ -22,31 +23,34 @@ export default function Account() {
 
       const { data, error, status } = await supabase
         .from('profiles')
-        .select(`username, website, avatar_url`)
+        .select(`first_name, last_name, is_restaurant`)
         .eq('id', session.user.id)
         .single()
+
       if (error && status !== 406) throw error
 
       if (data) {
-        setUsername(data.username)
-        setWebsite(data.website)
-        setAvatarUrl(data.avatar_url)
+        setFirstname(data.first_name)
+        setLastname(data.last_name)
+        setRestaurant(data.is_restaurant)
       }
     } catch (error) {
-      if (error instanceof Error) Alert.alert(error.message)
+      if (error instanceof Error) {
+        Alert.alert(error.message)
+      }
     } finally {
       setLoading(false)
     }
   }
 
   async function updateProfile({
-    username,
-    website,
-    avatar_url,
+    firstName,
+    lastName,
+    isRestaurant,
   }: {
-    username: string
-    website: string
-    avatar_url: string
+    firstName: string
+    lastName: string
+    isRestaurant: boolean
   }) {
     try {
       setLoading(true)
@@ -54,9 +58,9 @@ export default function Account() {
 
       const updates = {
         id: session.user.id,
-        username,
-        website,
-        avatar_url,
+        first_name: firstName, // corrected to match DB column
+        last_name: lastName,
+        is_restaurant: isRestaurant,
         updated_at: new Date(),
       }
 
@@ -77,16 +81,23 @@ export default function Account() {
       </View>
       <View style={styles.verticallySpaced}>
         <Input
-          label="Username"
-          value={username || ''}
-          onChangeText={(text) => setUsername(text)}
+          label="First Name"
+          value={firstname || ''}
+          onChangeText={(text) => setFirstname(text)}
         />
       </View>
       <View style={styles.verticallySpaced}>
         <Input
-          label="Website"
-          value={website || ''}
-          onChangeText={(text) => setWebsite(text)}
+          label="Last Name"
+          value={lastname || ''}
+          onChangeText={(text) => setLastname(text)}
+        />
+      </View>
+      <View style={styles.verticallySpaced}>
+        <Checkbox
+          value={isRestaurant}
+          onValueChange={setRestaurant}
+          color={isRestaurant ? '#4630EB' : undefined}
         />
       </View>
 
@@ -94,7 +105,11 @@ export default function Account() {
         <Button
           title={loading ? 'Loading ...' : 'Update'}
           onPress={() =>
-            updateProfile({ username, website, avatar_url: avatarUrl })
+            updateProfile({
+              firstName: firstname,
+              lastName: lastname,
+              isRestaurant,
+            })
           }
           disabled={loading}
         />
