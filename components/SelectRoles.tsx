@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react' 
 import { supabase } from '../lib/supabase'
 import { StyleSheet, View, Alert } from 'react-native'
 import { Button, Input } from '@rneui/themed'
 import { Checkbox } from 'expo-checkbox'
 import { useAuth } from '../contexts/AuthContext' // 👈 import your hook
 
-export default function SelectRoles() {
+export default function SelectRoles({ navigation }) { // 👈 add navigation prop
   const { session } = useAuth() // 👈 get session from context
   const [loading, setLoading] = useState(true)
   const [firstname, setFirstname] = useState('')
@@ -58,7 +58,7 @@ export default function SelectRoles() {
 
       const updates = {
         id: session.user.id,
-        first_name: firstName, // corrected to match DB column
+        first_name: firstName,
         last_name: lastName,
         is_restaurant: isRestaurant,
         updated_at: new Date(),
@@ -117,6 +117,14 @@ export default function SelectRoles() {
 
       <View style={styles.verticallySpaced}>
         <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
+      </View>
+
+      {/* 👇 New button to go back to Main */}
+      <View style={styles.verticallySpaced}>
+        <Button
+          title="Go to Main"
+          onPress={() => navigation.navigate('Main')}
+        />
       </View>
     </View>
   )
